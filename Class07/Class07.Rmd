@@ -24,7 +24,7 @@ rescale(1:5)
 ```
 
 ```{r}
-rescale(c(1:5, "string"))
+#rescale(c(1:5, "string"))
 ```
 
 We want to make this function more robust 
