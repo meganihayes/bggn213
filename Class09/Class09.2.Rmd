@@ -1,0 +1,35 @@
+---
+title: "Class09 hands on"
+author: "Megan Hayes"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+x <- read.csv("UK_foods.csv", row.names = 1)
+x
+barplot(as.matrix(x), col = rainbow(nrow(x)))
+pairs(x, col=rainbow(10), pch=16)
+```
+
+PCA
+```{r}
+pca <- prcomp( t(x) )
+summary(pca)
+```
+
+making pca plot
+```{r}
+plot(pca$x[,1], pca$x[,2])
+text(pca$x[,1], pca$x[,2], labels=colnames(x), col = c("orange", "red", "blue", "darkgreen"))
+```
+
+```{r}
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,1], las=2 )
+```
+

@@ -1,0 +1,30 @@
+---
+title: "Class07"
+author: "Megan Hayes"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Clustering
+
+```{r}
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+x <- cbind(x=tmp, y=rev(tmp))
+plot(x)
+km <- kmeans(x, 2, nstart = 20)
+km
+```
+
+```{r}
+plot(x, col=km$cluster)
+points(km$centers, col = "blue", pch = 15, cex = 3)
+```
+
+```{r}
+
+```
+

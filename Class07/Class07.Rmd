@@ -1,0 +1,103 @@
+---
+title: "Class07"
+author: "Megan Hayes"
+date: "January 30, 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Functions revisted
+
+Load (i.e. **source**) our rescale() function from last class.
+
+```{r}
+source("http://tinyurl.com/rescale-R")
+```
+
+Test this function
+
+```{r}
+rescale(1:5)
+```
+
+```{r}
+rescale(c(1:5, "string"))
+```
+
+We want to make this function more robust 
+
+```{r}
+rescale2(c(1:5, "string"))
+```
+
+```{r}
+is.numeric(1:5)
+```
+
+```{r}
+is.numeric("string")
+```
+
+```{r}
+is.numeric(c(1:5, "string"))
+```
+
+```{r}
+
+!is.numeric(c(1:5, "string"))
+```
+
+```{r}
+!is.numeric(1:5)
+```
+
+```{r}
+x <- c( 1, 2, NA, 3, NA)
+y<-c(NA,3,NA,3, 4)
+```
+
+```{r}
+is.na(x)
+is.na(y)
+```
+
+```{r}
+is.na(x)
+is.na(y)
+
+is.na(x) & is.na(y)
+sum( is.na(x) & is.na(y) )
+```
+
+
+```{r}
+both.na <- function(x, y) {
+  sum( is.na(x) & is.na(y) )
+}
+
+```
+
+```{r}
+both.na(x,y)
+```
+
+```{r}
+x <- c(NA, NA, NA)
+y1 <- c(1, NA, NA)
+y2 <- c(1, NA, NA, NA)
+
+both.na(x, y2)
+```
+
+```{r}
+x <- c(1, 2, NA, 3, NA)
+y <- c(NA, 3, NA, 3, 4)
+both_na3(x,y)
+```
+
+
+
+
