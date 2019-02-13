@@ -2,7 +2,7 @@
 title: "Class 6 R Functions"
 author: "Megan Hayes"
 date: "January 25, 2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
