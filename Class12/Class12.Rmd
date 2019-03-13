@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Clean up our protein target structure
+
+First we download a target (i.e. protein receptor) structure from the main PDB database. We will pick PDB ID "1hsg"
+
+```{r}
+library(bio3d)
+pdb.code <- "1hsg"
+file.name <- get.pdb("1hsg")
+```
+
+Extract the protein only segments of this PDB entry and write out a new PDB format file. We will also do the same for the bound ligand. 
+
+```{r}
+hiv <- read.pdb(file.name)
+hiv
+```
+
+Protein extraction first
+
+```{r}
+prot <- trim.pdb(hiv, "protein")
+prot
+```
+
+```{r}
+prot.filename <- paste(pdb.code, "_protein.pdb", sep = "")
+write.pdb(prot, file=prot.filename)
+```
+
+
+```{r}
+lig <- trim.pdb(hiv, "ligand")
+lig
+lig.filename <- paste(pdb.code, "_lig.pdb", sep = "")
+write.pdb(lig, file=lig.filename)
+```
+
+## Convert out docking results for viewing in VMD
+
+```{r}
+res <- read.pdb("all.pdbqt", multi=TRUE)
+res
+```
+
+```{r}
+write.pdb(res, file="results.pdb")
+```
+
+```{r}
+# res <- read.pdb("all.pdbqt", multi=TRUE)
+ori <- read.pdb("ligand.pdbqt")
+rmsd(ori, res)
+```
+
+```{r}
+rmsd(res)
+```
+
