@@ -1,0 +1,189 @@
+---
+title: "Class15"
+author: "Megan Hayes"
+date: "March 1, 2019"
+output: github_document
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(DESeq2)
+```
+
+```{r}
+metaFile <- "GSE37704_metadata (1).csv"
+countFile <- "GSE37704_featurecounts (1).csv"
+
+# Import metadata
+colData <- read.csv(metaFile, row.names=1)
+head(colData)
+```
+
+```{r}
+# Import count data
+countData = read.csv(countFile, row.names=1)
+head(countData)
+```
+
+```{r}
+nrow(countData)
+# Note we need to remove the odd first $length col
+countData <- as.matrix(countData[,-1])
+dim(countData)
+```
+
+```{r}
+
+all(rownames(colData) == colnames(countData))
+```
+
+```{r}
+head(countData)
+```
+
+```{r Removed_zero_count_genes}
+inds <- rowSums(countData) != 0
+countData <- countData [inds, ]
+head(countData)
+```
+
+```{r}
+nrow(countData)
+```
+
+## Running DESeq2
+
+```{r}
+dds = DESeqDataSetFromMatrix(countData=countData,
+                             colData=colData,
+                             design=~condition)
+dds = DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+head(res)
+```
+
+```{r}
+mycols <- rep("gray", nrow(res))
+mycols[abs(res$log2FoldChange) > 2] <- "red"
+inds <- (res$padj < 0.01 & abs(res$log2FoldChange) > 2)
+mycols[inds] <- "blue"
+plot(res$log2FoldChange, -log(res$padj), col = mycols)
+```
+
+```{r}
+head(res)
+#write.csv(res, file = "")
+```
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+columns(org.Hs.eg.db)
+
+res$symbol = mapIds(org.Hs.eg.db,
+                    keys=row.names(res), 
+                    keytype="ENSEMBL",
+                    column="SYMBOL",
+                    multiVals="first")
+
+res$entrez = mapIds(org.Hs.eg.db,
+                    keys=row.names(res),
+                    keytype="ENSEMBL",
+                    column="ENTREZID",
+                    multiVals="first")
+
+res$name =   mapIds(org.Hs.eg.db,
+                    keys=row.names(res),
+                    keytype="ENSEMBL",
+                    column="GENENAME",
+                    multiVals="first")
+
+head(res, 10)
+```
+
+```{r}
+res = res[order(res$pvalue),]
+write.csv(res, file="deseq_results.csv")
+```
+
+```{r eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite( c("pathview", "gage", "gageData") )
+```
+
+```{r}
+library(pathview)
+```
+
+
+```{r}
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+
+# Focus on signaling and metabolic pathways only
+kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+
+# Examine the first 3 pathways
+head(kegg.sets.hs, 3)
+```
+
+```{r}
+foldchanges = res$log2FoldChange
+names(foldchanges) = res$entrez
+head(foldchanges)
+```
+
+```{r}
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+attributes(keggres)
+```
+
+```{r}
+head(keggres$less)
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04110")
+```
+
+![](hsa04110.pathview.png)
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa03013", kegg.native=FALSE)
+
+```
+
+
+```{r}
+data(go.sets.hs)
+data(go.subs.hs)
+
+# Focus on Biological Process subset of GO
+gobpsets = go.sets.hs[go.subs.hs$BP]
+
+gobpres = gage(foldchanges, gsets=gobpsets, same.dir=TRUE)
+
+lapply(gobpres, head)
+```
+
+```{r}
+sig_genes <- res[res$padj <= 0.05 & !is.na(res$padj), "symbol"]
+print(paste("Total number of significant genes:", length(sig_genes)))
+```
+
+```{r}
+write.table(sig_genes, file="significant_genes.txt", row.names=FALSE, col.names=FALSE, quote=FALSE)
+```
+
