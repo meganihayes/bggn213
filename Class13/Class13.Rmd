@@ -1,0 +1,68 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(mxl)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.)/ nrow(mxl) *100
+```
+
+FASTQ Quality scores
+
+```{r}
+#install.packages("seqinr")
+#install.packages("gtools")
+library(seqinr)
+library(gtools)
+chars <- s2c("DDDDCDEDCDDDDBBDDDCC@") 
+chars
+phred <- asc(chars)-33
+phred
+
+```
+
+##Genotype bassed expression levels
+
+```{r}
+expr <- read.table("rs8067378_ENSG00000172057.6.txt")
+expr
+```
+
+```{r}
+table(expr$geno)
+```
+
+```{r}
+inds.gg <- expr$geno == "G/G"
+summary(expr[inds.gg, "exp"])
+```
+
+```{r}
+inds.aa <- expr$geno =="A/A"
+summary(expr[inds.aa, "exp"])
+```
+
+```{r}
+inds.ag <- expr$geno =="A/G"
+summary(expr[inds.ag, "exp"])
+```
+
+```{r}
+boxplot(exp ~ geno,data=expr, notch=TRUE)
+```
+
